@@ -438,6 +438,28 @@ class JSONPainter(object):
             d['meta'] = json.loads(d['meta'])
             data.append(d)
         return data
+    
+    @staticmethod
+    def paint_labels_doc_classify(documents, labels):
+        serializer_labels = LabelSerializer(labels, many=True)
+        serializer = DocumentSerializer(documents, many=True)
+        data = []
+        for d in serializer.data:
+            labels = []
+            for a in d['annotations']:
+                label_obj = [x for x in serializer_labels.data if x['id'] == a['label']][0]
+                label_text = label_obj['text']
+                label_start = a.get('start_offset')
+                label_end = a.get('end_offset')
+                if label_start is not None and label_end is not None:
+                    labels.append([label_start, label_end, label_text])
+                else:
+                    labels.append(label_text)
+            d.pop('annotations')
+            d['labels'] = labels
+            d['meta'] = json.loads(d['meta'])
+            data.append(d)
+        return data
 
 
 class CSVPainter(JSONPainter):
