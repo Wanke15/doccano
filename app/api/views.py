@@ -319,7 +319,9 @@ class TextDownloadAPI(APIView):
             labels = project.labels.all()
             data = JSONPainter.paint_labels(documents, labels)
         else:
-            data = painter.paint(documents)
+            labels = project.labels.all()
+            data = JSONPainter.paint_labels_doc_classify(documents, labels)
+            # data = painter.paint(documents)
         return Response(data)
 
     def select_painter(self, format):
